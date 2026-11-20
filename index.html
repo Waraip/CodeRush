@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Code Rush</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+</head>
+<body>
+<div id="app">
+
+  <!-- MENU -->
+  <section id="menu" class="screen">
+    <div class="center-box">
+      <h1 class="logo">CodeRush</h1>
+      <p class="muted tagline">Improve your typing skills.</p>
+      <button class="btn primary wide" id="btnStart">Start Game</button>
+      <button class="btn wide" id="btnBattle">Battle Mode (vs NPC / Online)</button>
+      <div class="grid2">
+        <button class="btn" id="btnInfo">View Instructions</button>
+        <button class="btn" id="btnStats">View Statistics</button>
+        <button class="btn" id="btnBoard">Leaderboard</button>
+        <button class="btn" id="btnExit">Exit</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETUP -->
+  <section id="setup" class="screen">
+    <div class="center-box">
+      <div class="kicker">[ SELECT DIFFICULTY ]</div>
+      <div class="row" id="nameRow">
+        <span class="muted">Your name:</span>
+        <input id="nameField" class="field" value="Player" maxlength="40" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="msg err" id="setupMessage">&nbsp;</div>
+      <div class="levels" id="levels"></div>
+      <button class="btn mt" id="setupBack">Back</button>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section id="game" class="screen">
+    <div class="pad col">
+      <div class="header">
+        <div class="grow">
+          <div class="mono small muted" id="gameHeader">&nbsp;</div>
+          <div id="gameInfo" class="info"></div>
+        </div>
+        <div class="pills">
+          <div class="pill neon" id="liveWpm">WPM 0</div>
+          <div class="pill purple" id="timerLabel">01:00.0</div>
+        </div>
+      </div>
+      <canvas id="typingCanvas" class="typing" tabindex="0"></canvas>
+      <div class="bottom">
+        <button class="btn" id="gameBack">Back</button>
+        <div class="muted grow center-text" id="gameStatus">&nbsp;</div>
+        <button class="btn primary" id="gameSubmit">Submit</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result" class="screen">
+    <div class="pad col">
+      <h2 class="title" id="resultTitle">RESULT</h2>
+      <div class="muted center-text bold" id="resultSub"></div>
+      <div class="rating mono" id="ratingLabel"></div>
+      <div class="grow centered"><div class="statgrid" id="resultStats"></div></div>
+      <div class="row wrap">
+        <button class="btn primary" id="resSame">Same difficulty</button>
+        <button class="btn" id="resChange">Change difficulty</button>
+        <button class="btn" id="resOutput">Show output</button>
+        <button class="btn" id="resEnd">End session</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SESSION SUMMARY -->
+  <section id="summary" class="screen">
+    <div class="pad col">
+      <h2 class="title" id="summaryTitle"></h2>
+      <div class="grow col scrollcol" id="summaryBody"></div>
+      <div class="row wrap">
+        <button class="btn primary" id="sumAgain">Play Again</button>
+        <button class="btn" id="sumMenu">Main Menu</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATISTICS -->
+  <section id="stats" class="screen">
+    <div class="pad col">
+      <h2 class="title" id="statsTitle"></h2>
+      <div class="grow col scrollcol" id="statsBody"></div>
+      <div class="row wrap"><button class="btn" id="statsBack">Back to Menu</button></div>
+    </div>
+  </section>
+
+  <!-- LEADERBOARD -->
+  <section id="board" class="screen">
+    <div class="pad col">
+      <h2 class="title">LEADERBOARD</h2>
+      <div class="tabs" id="boardTabs"></div>
+      <div class="grow col scrollcol" id="boardBody"></div>
+      <div class="row wrap"><button class="btn primary" id="boardBack">Back to Menu</button></div>
+    </div>
+  </section>
+
+  <!-- INFO -->
+  <section id="info" class="screen">
+    <div class="pad col">
+      <h2 class="title" id="infoTitle"></h2>
+      <pre class="grow textbox" id="infoText"></pre>
+      <div class="row wrap"><button class="btn primary" id="infoBack">Back to Menu</button></div>
+    </div>
+  </section>
+
+  <!-- OUTPUT -->
+  <section id="output" class="screen">
+    <div class="pad col">
+      <h2 class="title" id="outputTitle"></h2>
+      <div class="grow split">
+        <div class="col"><div class="caption">YOUR CODE (as you typed it)</div><pre class="textbox grow" id="codeText"></pre></div>
+        <div class="col"><div class="caption">OUTPUT</div><pre class="textbox grow wrapbox" id="outputText"></pre></div>
+      </div>
+      <div class="row wrap"><button class="btn primary" id="outBack">Back to Result</button></div>
+    </div>
+  </section>
+
+  <!-- BATTLE: setup -->
+  <section id="battleSetup" class="screen">
+    <div class="center-box">
+      <h1 class="logo small-logo">BATTLE MODE</h1>
+      <p class="muted tagline">Type the same code. The first to finish hits the other player.</p>
+      <div class="row" style="margin-top:14px">
+        <span class="muted">Your name:</span>
+        <input id="bNameField" class="field" value="Player" maxlength="40" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="muted tiny center-text" style="margin-top:10px">Text to type:</div>
+      <div class="levels two" id="bKinds"></div>
+      <div class="levels small" id="bLevels"></div>
+      <div class="muted tiny center-text">Difficulty sets the snippets (or word count) and the NPC's speed (about 35 / 65 / 90 WPM). No timer. In an online game the host's choices are used.</div>
+      <button class="btn primary wide mt" id="bNpc">Play vs NPC</button>
+      <button class="btn wide" id="bHost">Host an online game</button>
+      <div class="row">
+        <span class="muted">Room code:</span>
+        <input id="bCode" class="field short" placeholder="ABC12" maxlength="8" autocomplete="off" spellcheck="false">
+        <button class="btn" id="bJoin">Join</button>
+      </div>
+      <div class="msg" id="bMessage">&nbsp;</div>
+      <button class="btn mt" id="bBack">Back</button>
+    </div>
+  </section>
+
+  <!-- BATTLE: arena -->
+  <section id="battleArena" class="screen">
+    <div class="pad col">
+      <div class="mono small muted" id="bHeader">&nbsp;</div>
+      <canvas id="arenaCanvas" class="arena"></canvas>
+      <canvas id="bTypingCanvas" class="typing" tabindex="0"></canvas>
+      <div class="bottom">
+        <button class="btn" id="bQuit">Quit</button>
+        <div class="muted grow center-text" id="bStatus">&nbsp;</div>
+        <button class="btn primary hidden" id="bRematch">Rematch</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script src="game.js"></script>
+</body>
+</html>
